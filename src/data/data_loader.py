@@ -107,6 +107,41 @@ def load_paired_segments_with_filtering(folder_path, segment_length=1.0, channel
 
     return gpi_segments, stn_segments, target_fs
 
+def load_paired_segments_onstim_with_filtering(folder_path,freq, segment_length=1.0, channel_idx=0, cutoff=50, order=8, plot = False):
+    gpi_data, fs = load_and_normalize_mat(os.path.join(folder_path, f'GPi_{freq}.mat'))
+    stn_data, _ = load_and_normalize_mat(os.path.join(folder_path, f'STN_{freq}.mat'))
+
+    target_fs = 500
+    gpi_data = downsample(gpi_data, fs, target_fs)
+    stn_data = downsample(stn_data, fs, target_fs)
+
+    # Plot PSD before and after filtering for a channel (example: GPi and STN channel 0)
+    gpi_filtered = apply_notch_filter(gpi_data, target_fs)
+    stn_filtered = apply_notch_filter(stn_data, target_fs)
+
+    # Apply high-order low-pass filter
+    gpi_filtered = apply_lowpass_filter(gpi_filtered, target_fs, cutoff, order)
+    stn_filtered = apply_lowpass_filter(stn_filtered, target_fs, cutoff, order)
+
+    if plot:
+        plot_psd_comparison(gpi_data, gpi_filtered, target_fs, channel_idx)
+        plot_psd_comparison(stn_data, stn_filtered, target_fs, channel_idx)
+
+        plot_time_comparison(gpi_data, gpi_filtered, target_fs, channel_idx)
+        plot_time_comparison(stn_data, stn_filtered, target_fs, channel_idx)
+
+    gpi_segments = segment_data(gpi_filtered, segment_length, target_fs)
+    stn_segments = segment_data(stn_filtered, segment_length, target_fs)
+
+    print("segments of gpi", np.shape(gpi_segments))
+    print("segments of stn", np.shape(stn_segments))
+
+    num_pairs = min(len(gpi_segments), len(stn_segments))
+    gpi_segments = gpi_segments[:num_pairs]
+    stn_segments = stn_segments[:num_pairs]
+
+    return gpi_segments, stn_segments, target_fs
+
 
 def build_dataset_with_lag(gpi_segs, stn_segs, lags=3): 
     """
