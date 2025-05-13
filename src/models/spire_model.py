@@ -78,3 +78,26 @@ class SPIRE(nn.Module):
         recon_stn = self.decoder_stn(shared_stn, private_stn)
 
         return recon_gpi, recon_stn, shared_gpi, shared_stn, private_gpi, private_stn
+    
+#thriple AE
+class SPIRE_3Region(nn.Module):
+    def __init__(self, input_dim_gpi, input_dim_stn, input_dim_thal, shared_dim=32, private_dim=32, hidden_dim=64, dropout_prob=0.3):
+        super().__init__()
+        self.encoder_gpi = LatentEncoder(input_dim_gpi, shared_dim, private_dim, hidden_dim, dropout_prob)
+        self.encoder_stn = LatentEncoder(input_dim_stn, shared_dim, private_dim, hidden_dim, dropout_prob)
+        self.encoder_thal = LatentEncoder(input_dim_thal, shared_dim, private_dim, hidden_dim, dropout_prob)
+
+        self.decoder_gpi = LatentDecoder(shared_dim, private_dim, input_dim_gpi, hidden_dim, num_layers = 2)
+        self.decoder_stn = LatentDecoder(shared_dim, private_dim, input_dim_stn, hidden_dim, num_layers = 2)
+        self.decoder_thal = LatentDecoder(shared_dim, private_dim, input_dim_thal, hidden_dim, num_layers = 2)
+
+    def forward(self, x_gpi, x_stn, x_thal):
+        shared_gpi, private_gpi = self.encoder_gpi(x_gpi)
+        shared_stn, private_stn = self.encoder_stn(x_stn)
+        shared_thal, private_thal = self.encoder_thal(x_thal)
+
+        recon_gpi = self.decoder_gpi(shared_gpi, private_gpi)
+        recon_stn = self.decoder_stn(shared_stn, private_stn)
+        recon_thal = self.decoder_thal(shared_thal, private_thal)
+
+        return recon_gpi, recon_stn,recon_thal, shared_gpi, shared_stn,shared_thal, private_gpi, private_stn,private_thal

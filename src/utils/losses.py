@@ -27,3 +27,9 @@ def orthogonality_loss(shared, private):
     # Inner product → shape (D_s, D_p)
     prod = torch.matmul(s.T, p)
     return torch.norm(prod, p='fro') / prod.numel() #Frobenius norm of the product matrix
+
+def reconstruction_loss3(x_gpi, recon_gpi, x_stn, recon_stn, x_thal, recon_thal):
+    loss_gpi = F.mse_loss(recon_gpi, x_gpi)
+    loss_stn = F.mse_loss(recon_stn, x_stn)
+    loss_thal = F.mse_loss(recon_thal, x_thal)
+    return loss_gpi + loss_stn + loss_thal
