@@ -1,7 +1,7 @@
 
 # SPIRE-NeurIPS2025 (Anonymized Submission)
 
-This repository contains an anonymized implementation of **SPIRE** (Shared-Private Inter-Regional Encoder), a multi-region latent modeling framework for intracranial neural recordings. SPIRE learns to disentangle shared and region-specific dynamics across brain areas using dual GRU-based encoders and decoders, guided by reconstruction, alignment, and orthogonality losses.
+This repository contains an anonymized implementation of **SPIRE** (Shared-Private Inter-Regional Encoder), a multi-region latent modeling framework for intracranial neural recordings (i.e. local field potentails (LFPs)). SPIRE learns to disentangle shared and region-specific dynamics across brain areas using dual GRU-based encoders and decoders, guided by reconstruction, alignment, and orthogonality losses.
 
 This work has been submitted to NeurIPS 2025.
 
